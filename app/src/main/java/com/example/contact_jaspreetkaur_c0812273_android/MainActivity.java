@@ -5,15 +5,21 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.contact_jaspreetkaur_c0812273_android.adapter.RecyclerViewAdapter;
@@ -23,9 +29,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnContactClickListener{
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnContactClickListener,RecyclerViewAdapter.OnContactLongClickListener{
 
     public static final String CONTACT_ID = "contactId";
+    private static final int REQUEST_PHONE_CALL = 1;
 
     // declaration of employeeViewModel
     private ContactViewModel contactViewModel;
@@ -50,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         contactViewModel.getAllContacts().observe(this, contacts -> {
             // set adapter
-            recyclerViewAdapter = new RecyclerViewAdapter(contacts, this, this);
+            recyclerViewAdapter = new RecyclerViewAdapter(contacts, this, this,this);
             recyclerView.setAdapter(recyclerViewAdapter);
         });
 
@@ -159,4 +166,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         intent.putExtra(CONTACT_ID, contact.getId());
         startActivity(intent);
     }
+
+    @Override
+    public void onContactLongClick(int position)
+    {
+
+        //making a phone call
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        Contact contact = contactViewModel.getAllContacts().getValue().get(position);
+       String  mobilePhone = contact.getPhoneNumber();
+
+        intent.setData(Uri.parse("tel:" + mobilePhone));
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+        }
+        else
+        {
+            startActivity(intent);
+        }
+    }
+
+
 }

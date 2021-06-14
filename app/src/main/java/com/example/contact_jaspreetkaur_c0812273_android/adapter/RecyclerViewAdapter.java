@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.contact_jaspreetkaur_c0812273_android.MainActivity;
 import com.example.contact_jaspreetkaur_c0812273_android.R;
 import com.example.contact_jaspreetkaur_c0812273_android.model.Contact;
 
@@ -19,11 +20,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<Contact> contactList;
     private Context context;
     private OnContactClickListener onContactClickListener;
+    private OnContactLongClickListener onContactLongClickListener;
 
-    public RecyclerViewAdapter(List<Contact> contactList, Context context, OnContactClickListener onContactClickListener) {
+    public RecyclerViewAdapter(List<Contact> contactList, Context context, OnContactClickListener onContactClickListener, OnContactLongClickListener onContactLongClickListener) {
         this.contactList = contactList;
         this.context = context;
         this.onContactClickListener = onContactClickListener;
+        this.onContactLongClickListener =  onContactLongClickListener;
     }
 
     @NonNull
@@ -50,7 +53,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return contactList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener , View.OnLongClickListener{
         private TextView firstName;
         private TextView lastName;
         private TextView email;
@@ -69,6 +72,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
 
         }
 
@@ -76,10 +80,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public void onClick(View v) {
             onContactClickListener.onContactClick(getAdapterPosition());
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+        onContactLongClickListener.onContactLongClick(getAdapterPosition());
+        return false;
+        }
     }
 
     public interface OnContactClickListener {
         void onContactClick(int position);
+    }
+    public interface OnContactLongClickListener {
+        void onContactLongClick(int position);
     }
 
 }
