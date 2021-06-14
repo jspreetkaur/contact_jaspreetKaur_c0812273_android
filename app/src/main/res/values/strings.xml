@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Contact List</string>
+    <string name="add_contact_button">Add Contact</string>
+    <string name="name_row">Name</string>
+    <string name="person_image">Person image</string>
+
+    <string name="add_new_contact_label">Add New Contact</string>
+    <string name="firstname_placeholder">First Name</string>
+    <string name="lastname_placeholder">Last Name</string>
+    <string name="email_placeholder">Email</string>
+    <string name="phonenumber_placeholder">Phone Number</string>
+    <string name="address_placeholder">Address</string>
+    <string name="add_button_text">Save</string>
+    <string name="update_label">Update</string>
+    <string name="update_btn_text">Update</string>
+
+
+</resources>
