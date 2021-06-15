@@ -120,28 +120,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }
     };
 
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_EMPLOYEE_REQUEST_CODE && resultCode == RESULT_OK) {
-            Log.d(TAG, "onActivityResult: " + data.getStringExtra(AddEmployeeActivity.NAME_REPLY));
-
-            String name = data.getStringExtra(AddEmployeeActivity.NAME_REPLY);
-            String salary = data.getStringExtra(AddEmployeeActivity.SALARY_REPLY);
-            String department = data.getStringExtra(AddEmployeeActivity.DEPARTMENT_REPLY);
-            // getting the current date
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
-            String joiningDate = sdf.format(cal.getTime());
-
-            Employee employee = new Employee(name, department, joiningDate, Double.parseDouble(salary));
-            employeeViewModel.insert(employee);
-
-        }
-    }
-*/
-    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+       ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
@@ -174,9 +153,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         //making a phone call
         Intent intent = new Intent(Intent.ACTION_CALL);
         Contact contact = contactViewModel.getAllContacts().getValue().get(position);
+
+        //getting employ number
        String  mobilePhone = contact.getPhoneNumber();
 
         intent.setData(Uri.parse("tel:" + mobilePhone));
+        //checking for call permission
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
         }
