@@ -14,12 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.contact_jaspreetkaur_c0812273_android.adapter.RecyclerViewAdapter;
@@ -32,7 +35,8 @@ import com.google.android.material.snackbar.Snackbar;
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnContactClickListener,RecyclerViewAdapter.OnContactLongClickListener{
 
     public static final String CONTACT_ID = "contactId";
-    private static final int REQUEST_PHONE_CALL = 1;
+    private static final int REQUEST_PHONE_CALL = 0;
+    private static final int  REQUEST_SMS = 0;
 
     // declaration of employeeViewModel
     private ContactViewModel contactViewModel;
@@ -149,24 +153,71 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     public void onContactLongClick(int position)
     {
-
-        //making a phone call
-        Intent intent = new Intent(Intent.ACTION_CALL);
         Contact contact = contactViewModel.getAllContacts().getValue().get(position);
 
-        //getting employ number
-       String  mobilePhone = contact.getPhoneNumber();
+        //getting mobile number
+        String  mobilePhone = contact.getPhoneNumber();
+        String emailAddress = contact.getEmail();
+        String name = contact.getFirstName() + " " + contact.getLastName();
 
-        intent.setData(Uri.parse("tel:" + mobilePhone));
-        //checking for call permission
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
-        }
-        else
-        {
-            startActivity(intent);
-        }
-    }
+       AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 
+        alertDialog.setTitle("How do you want to contact?");
+
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Make a Call", new DialogInterface.OnClickListener() {
+
+            //When User clicks on Make a Call
+            public void onClick(DialogInterface dialog, int id) {
+
+                //making a phone call
+                Intent intent = new Intent(Intent.ACTION_CALL);
+
+                intent.setData(Uri.parse("tel:" + mobilePhone));
+                //checking for call permission
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+                }
+                else
+                {
+                    startActivity(intent);
+                }
+
+            } });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Send Message", new DialogInterface.OnClickListener() {
+
+            //When User clicks on Send Message
+            public void onClick(DialogInterface dialog, int id) {
+
+                Intent sInt = new Intent(Intent.ACTION_VIEW);
+                sInt.putExtra("address", mobilePhone);
+                sInt.putExtra("sms_body","Say Hello");
+                sInt.setType("vnd.android-dir/mms-sms");
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS},REQUEST_SMS);
+                }
+                else
+                {
+                    startActivity(Intent.createChooser(sInt, "Send sms via:"));
+                }
+
+            }});
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Email", new DialogInterface.OnClickListener() {
+            //When user clicks on Email
+            public void onClick(DialogInterface dialog, int id) {
+
+                Intent email = new Intent(Intent.ACTION_SEND);
+                email.putExtra(Intent.EXTRA_EMAIL, new String[]{ emailAddress});
+                email.putExtra(Intent.EXTRA_SUBJECT, "Greeting From" + name);
+                email.putExtra(Intent.EXTRA_TEXT, "Say Hello");
+                email.setType("message/rfc822");
+
+                startActivity(Intent.createChooser(email, "Send sms via:"));
+
+            }});
+        alertDialog.show();
 
 }
+
+    }
